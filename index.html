@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Karate Journey - 空手の旅</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        * { margin: 0; padding: 0; }
+        body {
+            background: #0a0a1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        canvas { image-rendering: pixelated; image-rendering: crisp-edges; }
+    </style>
+</head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+    <script src="js/scenes/IntroScene.js"></script>
+    <script src="js/scenes/TrainingScene.js"></script>
+    <script src="js/scenes/CityScene.js"></script>
+    <script src="js/scenes/FightScene.js"></script>
+    <script src="js/scenes/VictoryScene.js"></script>
+    <script src="js/scenes/GameOverScene.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
