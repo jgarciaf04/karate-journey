@@ -75,10 +75,11 @@ class FightScene extends Phaser.Scene {
         // Player animations (single-frame each)
         if (!this.anims.exists('player-idle')) {
             this.anims.create({ key: 'player-idle', frames: [{ key: 'player', frame: 0 }], frameRate: 1 });
-            this.anims.create({ key: 'player-punch', frames: [{ key: 'player', frame: 1 }], frameRate: 1 });
-            this.anims.create({ key: 'player-kick', frames: [{ key: 'player', frame: 2 }], frameRate: 1 });
-            this.anims.create({ key: 'player-block', frames: [{ key: 'player', frame: 3 }], frameRate: 1 });
-            this.anims.create({ key: 'player-hurt', frames: [{ key: 'player', frame: 4 }], frameRate: 1 });
+            this.anims.create({ key: 'player-walk', frames: [{ key: 'player', frame: 1 }, { key: 'player', frame: 2 }], frameRate: 4, repeat: -1 });
+            this.anims.create({ key: 'player-punch', frames: [{ key: 'player', frame: 3 }], frameRate: 1 });
+            this.anims.create({ key: 'player-kick', frames: [{ key: 'player', frame: 4 }], frameRate: 1 });
+            this.anims.create({ key: 'player-block', frames: [{ key: 'player', frame: 5 }], frameRate: 1 });
+            this.anims.create({ key: 'player-hurt', frames: [{ key: 'player', frame: 6 }], frameRate: 1 });
         }
 
         this.playerSprite.play('player-idle');

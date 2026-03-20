@@ -34,8 +34,8 @@ class GameOverScene extends Phaser.Scene {
             fontSize: '8px', fontFamily: '"Press Start 2P"', color: '#5C3A1E'
         }).setOrigin(0.5);
 
-        // Fallen character: player sprite (hurt frame 4), rotated 90 degrees
-        const fallen = this.add.sprite(400, 340, 'player', 4).setScale(3);
+        // Fallen character: player sprite (hurt frame 6), rotated 90 degrees
+        const fallen = this.add.sprite(400, 340, 'player', 6).setScale(3);
         fallen.setAngle(90);
 
         // Japanese proverb

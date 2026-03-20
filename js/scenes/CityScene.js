@@ -133,9 +133,10 @@ class CityScene extends Phaser.Scene {
             this.playerSprite.setTint(belt.color);
         }
 
-        // Define idle animation (guarded for scene restart)
+        // Define animations (guarded for scene restart)
         if (!this.anims.exists('player-idle')) {
             this.anims.create({ key: 'player-idle', frames: [{ key: 'player', frame: 0 }], frameRate: 1 });
+            this.anims.create({ key: 'player-walk', frames: [{ key: 'player', frame: 1 }, { key: 'player', frame: 2 }], frameRate: 4, repeat: -1 });
         }
         this.playerSprite.play('player-idle');
 
@@ -166,8 +167,24 @@ class CityScene extends Phaser.Scene {
 
     update() {
         const speed = 3;
-        if (this.keyA.isDown && this.playerX > 30) this.playerX -= speed;
-        if (this.keyD.isDown && this.playerX < 2780) this.playerX += speed;
+        let walking = false;
+        if (this.keyA.isDown && this.playerX > 30) {
+            this.playerX -= speed;
+            this.playerSprite.setFlipX(true);
+            walking = true;
+        }
+        if (this.keyD.isDown && this.playerX < 2780) {
+            this.playerX += speed;
+            this.playerSprite.setFlipX(false);
+            walking = true;
+        }
+
+        // Play walk or idle animation
+        if (walking && this.playerSprite.anims.currentAnim?.key !== 'player-walk') {
+            this.playerSprite.play('player-walk');
+        } else if (!walking && this.playerSprite.anims.currentAnim?.key !== 'player-idle') {
+            this.playerSprite.play('player-idle');
+        }
 
         if (Phaser.Input.Keyboard.JustDown(this.keySpace) && this.isOnGround) {
             this.velocityY = -10;
