@@ -126,7 +126,9 @@ class CityScene extends Phaser.Scene {
         const beltIndex = this.registry.get('beltIndex') || 0;
         const belt = BELTS[beltIndex];
         this.playerSprite = this.add.sprite(this.playerX, this.playerY, 'player', 0)
-            .setDepth(5);
+            .setDepth(5)
+            .setScale(2)
+            .setOrigin(0.5, 1);
         if (belt.color !== 0xFFFFFF) {
             this.playerSprite.setTint(belt.color);
         }

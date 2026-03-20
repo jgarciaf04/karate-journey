@@ -8,6 +8,7 @@ class IntroScene extends Phaser.Scene {
     }
 
     create() {
+        this.input.keyboard.removeAllListeners();
         this.registry.set('learnedMoves', { punch: false, kick: false, block: false });
         this.registry.set('beltIndex', 0);
 

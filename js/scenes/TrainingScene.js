@@ -18,6 +18,7 @@ class TrainingScene extends Phaser.Scene {
 
     create() {
         this.cameras.main.fadeIn(800);
+        this.input.keyboard.removeAllListeners();
         this.learned = { punch: false, kick: false, block: false };
         this.playerX = 250;
         this.playerBaseY = 440;
@@ -42,10 +43,10 @@ class TrainingScene extends Phaser.Scene {
         this.add.image(400, 300, 'bg-training').setDepth(0);
 
         // Makiwara
-        this.add.image(550, 415, 'makiwara').setDepth(3);
+        this.add.image(550, 415, 'makiwara').setDepth(3).setScale(2).setOrigin(0.5, 1);
 
         // Sensei
-        this.senseiSprite = this.add.sprite(100, 430, 'sensei', 0).setDepth(4);
+        this.senseiSprite = this.add.sprite(100, 430, 'sensei', 0).setDepth(4).setScale(2).setOrigin(0.5, 1);
         if (!this.anims.exists('sensei-idle')) {
             this.anims.create({ key: 'sensei-idle', frames: [{ key: 'sensei', frame: 0 }], frameRate: 1 });
             this.anims.create({ key: 'sensei-teaching', frames: [{ key: 'sensei', frame: 1 }], frameRate: 1 });
@@ -53,7 +54,7 @@ class TrainingScene extends Phaser.Scene {
         this.senseiSprite.play('sensei-idle');
 
         // Player sprite
-        this.playerSprite = this.add.sprite(this.playerX, this.playerY, 'player', 0).setDepth(5);
+        this.playerSprite = this.add.sprite(this.playerX, this.playerY, 'player', 0).setDepth(5).setScale(2).setOrigin(0.5, 1);
 
         // Player animations (guarded for scene restart)
         if (!this.anims.exists('player-idle')) {
@@ -284,7 +285,7 @@ class TrainingScene extends Phaser.Scene {
 
         // Belt promotion flash
         this.cameras.main.flash(500, 255, 215, 0);
-        this.showFeedback('EXAM PASSED! You earned the Yellow Belt!', '#FFD700');
+        this.showFeedback('EXAM PASSED! You earned the ' + BELTS[1].name + ' Belt!', '#FFD700');
 
         // Belt glow
         const glow = this.add.circle(this.playerX, this.playerY, 40, 0xFFD700, 0.2).setDepth(15);
@@ -343,7 +344,7 @@ class TrainingScene extends Phaser.Scene {
             this.instructionText.setText(`Perform: ${move.toUpperCase()} [${this.keyFor(move)}]`);
             this.senseiSpeech.setText(`"${move.toUpperCase()}!\nNow!"`);
         } else if (this.phase === 'passed') {
-            this.instructionText.setText('Yellow Belt earned! Press ENTER to go to the village');
+            this.instructionText.setText(BELTS[1].name + ' Belt earned! Press ENTER to go to the village');
             this.senseiSpeech.setText('"You are ready.\nGo, young warrior.\nProtect our village."');
         }
     }

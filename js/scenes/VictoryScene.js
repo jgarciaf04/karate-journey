@@ -11,6 +11,7 @@ class VictoryScene extends Phaser.Scene {
 
     create() {
         this.cameras.main.fadeIn(800);
+        this.input.keyboard.removeAllListeners();
         const cx = 400;
         const beltIndex = this.registry.get('beltIndex') || 0;
         const oldBelt = BELTS[beltIndex];

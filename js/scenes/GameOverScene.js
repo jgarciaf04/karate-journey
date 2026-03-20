@@ -10,6 +10,9 @@ class GameOverScene extends Phaser.Scene {
 
     create() {
         this.cameras.main.fadeIn(800);
+        this.input.keyboard.removeAllListeners();
+
+        const beltIndex = this.registry.get('beltIndex') || 0;
 
         // Dark red background
         this.add.image(400, 300, 'bg-gameover');
@@ -27,7 +30,7 @@ class GameOverScene extends Phaser.Scene {
             fontSize: '18px', fontFamily: '"Press Start 2P"', color: '#5C2020'
         }).setOrigin(0.5);
 
-        this.add.text(400, 220, 'The Oni Demon was too powerful...', {
+        this.add.text(400, 220, 'The ' + BELTS[beltIndex].enemy.name + ' was too powerful...', {
             fontSize: '8px', fontFamily: '"Press Start 2P"', color: '#5C3A1E'
         }).setOrigin(0.5);
 

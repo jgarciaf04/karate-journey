@@ -23,6 +23,7 @@ class FightScene extends Phaser.Scene {
 
     create() {
         this.cameras.main.fadeIn(800);
+        this.input.keyboard.removeAllListeners();
 
         const beltIndex = this.registry.get('beltIndex') || 0;
         const belt = BELTS[beltIndex];
@@ -106,7 +107,7 @@ class FightScene extends Phaser.Scene {
         this.monsterSprite.play(idleKey);
 
         // Eye glow overlay - pulsing red tint on the monster
-        this.eyeGlow = this.add.sprite(this.monsterX, this.monsterBaseY - 64, enemyKey, 0)
+        this.eyeGlow = this.add.sprite(this.monsterX, this.monsterBaseY, enemyKey, 0)
             .setDepth(5)
             .setScale(2)
             .setOrigin(0.5, 1)
@@ -150,25 +151,25 @@ class FightScene extends Phaser.Scene {
 
         // Labels
         this.add.text(75, 56, '\u3042\u306a\u305f (YOU)', {
-            fontSize: '10px', fontFamily: "'Press Start 2P'", color: '#F5E6C8'
+            fontSize: '10px', fontFamily: '"Press Start 2P"', color: '#F5E6C8'
         }).setOrigin(0.5).setDepth(20);
         this.add.text(625, 56, belt.enemy.kanji + ' ' + belt.enemy.name.toUpperCase(), {
-            fontSize: '10px', fontFamily: "'Press Start 2P'", color: '#ff8888'
+            fontSize: '10px', fontFamily: '"Press Start 2P"', color: '#ff8888'
         }).setOrigin(0.5).setDepth(20);
 
         // Controls UI
         this.add.text(400, 575, 'A/D: Move  SPACE: Jump  J: Punch  K: Kick  L: Block', {
-            fontSize: '9px', fontFamily: "'Press Start 2P'", color: '#F5E6C8',
+            fontSize: '9px', fontFamily: '"Press Start 2P"', color: '#F5E6C8',
             backgroundColor: '#1A0A2Ecc', padding: { x: 8, y: 4 }
         }).setOrigin(0.5).setDepth(20);
 
         this.actionText = this.add.text(400, 300, '', {
-            fontSize: '20px', fontFamily: "'Press Start 2P'", color: '#FFD700',
+            fontSize: '20px', fontFamily: '"Press Start 2P"', color: '#FFD700',
             stroke: '#1A0A2E', strokeThickness: 4
         }).setOrigin(0.5).setAlpha(0).setDepth(20);
 
         this.telegraphText = this.add.text(this.monsterX, 320, '', {
-            fontSize: '14px', fontFamily: "'Press Start 2P'", color: '#ff4444',
+            fontSize: '14px', fontFamily: '"Press Start 2P"', color: '#ff4444',
             stroke: '#000000', strokeThickness: 3
         }).setOrigin(0.5).setAlpha(0).setDepth(20);
 
@@ -198,7 +199,7 @@ class FightScene extends Phaser.Scene {
 
         // ===== FIGHT SPLASH =====
         const ft = this.add.text(400, 260, '\u6226\u3044 FIGHT!', {
-            fontSize: '36px', fontFamily: "'Press Start 2P'", color: '#CC2222',
+            fontSize: '36px', fontFamily: '"Press Start 2P"', color: '#CC2222',
             stroke: '#000000', strokeThickness: 5
         }).setOrigin(0.5).setDepth(30);
         this.tweens.add({
@@ -372,9 +373,9 @@ class FightScene extends Phaser.Scene {
         const hitY = this.monsterBaseY - 40;
         this.showImpact(type, hitX, hitY);
 
-        const dmgLabel = heartDmg === 1 ? '-half' : '-' + Math.ceil(heartDmg / 2) + (heartDmg % 2 === 0 ? '' : '.5');
+        const dmgLabel = '-' + heartDmg;
         const dmg = this.add.text(this.monsterX, 360, dmgLabel, {
-            fontSize: '12px', fontFamily: "'Press Start 2P'", color: '#ff4444',
+            fontSize: '12px', fontFamily: '"Press Start 2P"', color: '#ff4444',
             stroke: '#000', strokeThickness: 2
         }).setOrigin(0.5).setDepth(15);
         this.tweens.add({ targets: dmg, y: 310, alpha: 0, duration: 600, onComplete: () => dmg.destroy() });
