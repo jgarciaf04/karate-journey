@@ -1,76 +1,69 @@
 class GameOverScene extends Phaser.Scene {
     constructor() { super('GameOverScene'); }
 
+    preload() {
+        this.load.image('bg-gameover', 'assets/tiles/bg-gameover.png');
+        this.load.image('parchment', 'assets/ui/parchment.png');
+        this.load.spritesheet('player', 'assets/sprites/player.png', { frameWidth: 32, frameHeight: 48 });
+        this.load.image('petal', 'assets/fx/petal.png');
+    }
+
     create() {
         this.cameras.main.fadeIn(800);
+        this.input.keyboard.removeAllListeners();
 
-        const bg = this.add.graphics();
-        // Dark red gradient
-        for (let i = 0; i < 12; i++) {
-            bg.fillStyle(Phaser.Display.Color.GetColor(10 + i * 2, 2, 4 + i));
-            bg.fillRect(0, i * 50, 800, 51);
-        }
+        const beltIndex = this.registry.get('beltIndex') || 0;
 
-        // Parchment (damaged look)
-        bg.fillStyle(0x000000, 0.3);
-        bg.fillRoundedRect(155, 105, 500, 400, 8);
-        bg.fillStyle(0xE8D8B8, 0.9);
-        bg.fillRoundedRect(150, 100, 500, 400, 8);
-        bg.lineStyle(2, 0x5C3A1E);
-        bg.strokeRoundedRect(150, 100, 500, 400, 8);
+        // Dark red background
+        this.add.image(400, 300, 'bg-gameover');
 
-        // Fallen character
-        const cg = this.add.graphics();
-        cg.fillStyle(0xFFFFFF);
-        cg.fillRect(370, 370, 44, 16);
-        cg.fillStyle(0xDEB887);
-        cg.fillCircle(358, 378, 9);
-        cg.fillStyle(0x1A1A2E);
-        cg.fillEllipse(358, 373, 14, 6);
-        cg.fillStyle(0xCC2222);
-        cg.fillRect(350, 376, 16, 2);
-        cg.fillStyle(0xDAA520);
-        cg.fillRect(388, 374, 20, 3);
-        cg.fillStyle(0xFFFFFF);
-        cg.fillRect(410, 375, 16, 6);
+        // Parchment scroll centered, scaled to ~500x400
+        const parch = this.add.image(400, 300, 'parchment');
+        parch.setDisplaySize(500, 400);
 
+        // Title
         this.add.text(400, 140, '敗北', {
-            fontSize: '40px', fontFamily: 'serif', color: '#8B0000'
+            fontSize: '22px', fontFamily: '"Press Start 2P"', color: '#8B0000'
         }).setOrigin(0.5);
 
-        this.add.text(400, 185, 'DEFEATED', {
-            fontSize: '32px', fontFamily: 'monospace', color: '#5C2020', fontStyle: 'bold'
+        this.add.text(400, 180, 'DEFEATED', {
+            fontSize: '18px', fontFamily: '"Press Start 2P"', color: '#5C2020'
         }).setOrigin(0.5);
 
-        bg.lineStyle(2, 0x5C2020, 0.3);
-        bg.lineBetween(250, 205, 550, 205);
-
-        this.add.text(400, 230, 'The Oni Demon was too powerful...', {
-            fontSize: '14px', fontFamily: 'monospace', color: '#5C3A1E'
+        this.add.text(400, 220, 'The ' + BELTS[beltIndex].enemy.name + ' was too powerful...', {
+            fontSize: '8px', fontFamily: '"Press Start 2P"', color: '#5C3A1E'
         }).setOrigin(0.5);
 
-        this.add.text(400, 270, '七転び八起き', {
-            fontSize: '16px', fontFamily: 'serif', color: '#8B0000'
+        // Fallen character: player sprite (hurt frame 6), rotated 90 degrees
+        const fallen = this.add.sprite(400, 340, 'player', 6).setScale(3);
+        fallen.setAngle(90);
+
+        // Japanese proverb
+        this.add.text(400, 260, '七転び八起き', {
+            fontSize: '10px', fontFamily: '"Press Start 2P"', color: '#8B0000'
         }).setOrigin(0.5);
-        this.add.text(400, 295, '"Fall seven times, stand up eight"', {
-            fontSize: '11px', fontFamily: 'monospace', color: '#888888', fontStyle: 'italic'
+        this.add.text(400, 285, '"Fall seven times, stand up eight"', {
+            fontSize: '7px', fontFamily: '"Press Start 2P"', color: '#888888'
         }).setOrigin(0.5);
 
+        // Prompts
         const retry = this.add.text(400, 420, '[ Press ENTER to try again ]', {
-            fontSize: '15px', fontFamily: 'monospace', color: '#DAA520'
+            fontSize: '9px', fontFamily: '"Press Start 2P"', color: '#DAA520'
         }).setOrigin(0.5);
         this.tweens.add({ targets: retry, alpha: 0.3, duration: 600, yoyo: true, repeat: -1 });
 
         this.add.text(400, 455, '[ Press T to return to training ]', {
-            fontSize: '12px', fontFamily: 'monospace', color: '#888888'
+            fontSize: '7px', fontFamily: '"Press Start 2P"', color: '#888888'
         }).setOrigin(0.5);
 
-        // Dark petals
-        const colors = [0x8B4060, 0x6B3050, 0x5B2040];
+        // Dark petals using petal sprites
+        const tints = [0x8B4060, 0x6B3050, 0x5B2040];
         for (let i = 0; i < 10; i++) {
-            const p = this.add.ellipse(Math.random() * 800, -10, 2 + Math.random() * 2, 1.5,
-                Phaser.Utils.Array.GetRandom(colors)
-            ).setAlpha(0.4).setDepth(10);
+            const p = this.add.image(Math.random() * 800, -10, 'petal')
+                .setTint(Phaser.Utils.Array.GetRandom(tints))
+                .setAlpha(0.4)
+                .setScale(0.5 + Math.random() * 0.6)
+                .setDepth(10);
             this.tweens.add({
                 targets: p, x: p.x + 40 + Math.random() * 80, y: 620,
                 angle: Math.random() * 300, duration: 6000 + Math.random() * 4000,
