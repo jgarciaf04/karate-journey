@@ -1,0 +1,107 @@
+{
+  "meta": {
+    "description": "NES-style master palette reference for Karate Journey",
+    "references": ["Karate Champ (NES, 1986)", "Kung Fu / Spartan X (NES, 1985)"],
+    "constraints": {
+      "sprite": "Max 3 colors + transparency per sprite",
+      "backgroundTile": "Max 3 colors + transparency per 8x8 tile",
+      "scenePalettes": "Up to 4 distinct palettes per scene"
+    },
+    "spriteDimensions": {
+      "gridUnit": 8,
+      "allowedSizes": ["16x16", "16x32", "32x32", "32x48"],
+      "note": "All dimensions are multiples of the 8-pixel grid"
+    }
+  },
+
+  "colors": {
+    "skin": {
+      "skin":      "#DEB887",
+      "darkSkin":  "#CCA876"
+    },
+
+    "gi": {
+      "white":        "#FFFFFF",
+      "shadow":       "#EEEEEE",
+      "darkerShadow": "#DDDDDD"
+    },
+
+    "hair": {
+      "dark": "#1A1A2E"
+    },
+
+    "headband": {
+      "red": "#CC2222"
+    },
+
+    "belts": {
+      "white":  "#FFFFFF",
+      "gold":   "#DAA520",
+      "orange": "#FF8C00",
+      "green":  "#228B22",
+      "blue":   "#1E90FF",
+      "brown":  "#8B4513",
+      "black":  "#111111"
+    },
+
+    "environment": {
+      "greens": {
+        "forestGreen": "#228B22",
+        "darkGreen":   "#3A6B3A",
+        "midGreen":    "#5A8B4A",
+        "lightGreen":  "#6B9B5A"
+      },
+      "skyWater": {
+        "skyBlue":  "#87CEEB",
+        "midBlue":  "#4488CC",
+        "deepBlue": "#1B2838"
+      },
+      "night": {
+        "darkest": "#0A0A1E",
+        "dark":    "#1A1A30",
+        "mid":     "#2A2A5C"
+      },
+      "cherryBlossom": {
+        "light":  "#FFB7C5",
+        "mid":    "#FFC0CB",
+        "deep":   "#FF8FA8"
+      }
+    },
+
+    "oni": {
+      "purpleBody": "#6B2D8B",
+      "head":       "#8B3A62",
+      "eyes":       "#FF0000",
+      "horns":      "#AA3333"
+    },
+
+    "ui": {
+      "parchment": "#F5E6C8",
+      "borderRed": "#8B0000",
+      "gold":      "#DAA520"
+    }
+  },
+
+  "palettes": {
+    "player": {
+      "description": "Player character in white gi",
+      "colors": ["#DEB887", "#FFFFFF", "#CC2222"],
+      "note": "Skin + gi white + headband red; belt color swapped per rank"
+    },
+    "dojoDay": {
+      "description": "Daytime dojo / outdoor training ground",
+      "colors": ["#228B22", "#5A8B4A", "#87CEEB"],
+      "note": "Forest greens + sky blue background"
+    },
+    "dojoNight": {
+      "description": "Nighttime scene with cherry blossoms",
+      "colors": ["#0A0A1E", "#2A2A5C", "#FFB7C5"],
+      "note": "Dark sky + blossom accents"
+    },
+    "oniBoss": {
+      "description": "Oni demon boss encounter",
+      "colors": ["#6B2D8B", "#FF0000", "#AA3333"],
+      "note": "Purple body + red eyes and horn accents"
+    }
+  }
+}
