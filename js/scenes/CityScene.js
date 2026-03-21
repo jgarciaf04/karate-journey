@@ -43,52 +43,52 @@ class CityScene extends Phaser.Scene {
         // ===== PARALLAX BACKGROUND LAYERS =====
 
         // Sky (fixed, no scroll)
-        this.add.image(400, 300, 'bg-city-sky').setScrollFactor(0);
+        this.add.image(400, 300, 'bg-city-sky').setScrollFactor(0).setDepth(0);
 
         // Mountains (slow parallax)
-        this.add.image(400, 375, 'bg-city-mountains').setScrollFactor(0.1);
+        this.add.image(400, 375, 'bg-city-mountains').setScrollFactor(0.1).setDepth(1);
 
         // Far trees (medium parallax)
-        this.add.image(400, 375, 'bg-city-trees').setScrollFactor(0.3);
+        this.add.image(400, 375, 'bg-city-trees').setScrollFactor(0.3).setDepth(2);
 
         // Ground layer (full scroll, 2800px wide centered at 1400)
-        this.add.image(1400, 490, 'bg-city-ground').setScrollFactor(1.0);
+        this.add.image(1400, 490, 'bg-city-ground').setScrollFactor(1.0).setDepth(3);
 
         // ===== VILLAGE ELEMENTS =====
 
         // Start area: player's house + cherry tree
-        this.add.image(80, 500, 'house-small').setOrigin(0.5, 1);
-        this.add.image(200, 500, 'cherry-tree').setOrigin(0.5, 1);
+        this.add.image(80, 500, 'house-small').setOrigin(0.5, 1).setDepth(4);
+        this.add.image(200, 500, 'cherry-tree').setOrigin(0.5, 1).setDepth(4);
 
         // Village section
-        this.add.image(380, 500, 'cherry-tree').setOrigin(0.5, 1);
-        this.add.image(500, 500, 'house-medium').setOrigin(0.5, 1);
-        this.add.image(450, 500, 'lantern').setOrigin(0.5, 1);
-        this.add.image(620, 500, 'lantern').setOrigin(0.5, 1);
-        this.add.image(720, 500, 'house-small').setOrigin(0.5, 1);
-        this.add.image(850, 500, 'cherry-tree').setOrigin(0.5, 1);
+        this.add.image(380, 500, 'cherry-tree').setOrigin(0.5, 1).setDepth(4);
+        this.add.image(500, 500, 'house-medium').setOrigin(0.5, 1).setDepth(4);
+        this.add.image(450, 500, 'lantern').setOrigin(0.5, 1).setDepth(4);
+        this.add.image(620, 500, 'lantern').setOrigin(0.5, 1).setDepth(4);
+        this.add.image(720, 500, 'house-small').setOrigin(0.5, 1).setDepth(4);
+        this.add.image(850, 500, 'cherry-tree').setOrigin(0.5, 1).setDepth(4);
 
         // Market area
-        this.add.image(1000, 500, 'house-large').setOrigin(0.5, 1);
-        this.add.image(950, 500, 'lantern').setOrigin(0.5, 1);
-        this.add.image(1100, 500, 'lantern').setOrigin(0.5, 1);
-        this.add.image(1150, 500, 'market-stall').setOrigin(0.5, 1);
-        this.add.image(1250, 500, 'market-stall').setOrigin(0.5, 1);
-        this.add.image(1350, 500, 'cherry-tree').setOrigin(0.5, 1);
+        this.add.image(1000, 500, 'house-large').setOrigin(0.5, 1).setDepth(4);
+        this.add.image(950, 500, 'lantern').setOrigin(0.5, 1).setDepth(4);
+        this.add.image(1100, 500, 'lantern').setOrigin(0.5, 1).setDepth(4);
+        this.add.image(1150, 500, 'market-stall').setOrigin(0.5, 1).setDepth(4);
+        this.add.image(1250, 500, 'market-stall').setOrigin(0.5, 1).setDepth(4);
+        this.add.image(1350, 500, 'cherry-tree').setOrigin(0.5, 1).setDepth(4);
 
         // Temple area
-        this.add.image(1500, 500, 'torii').setOrigin(0.5, 1);
-        this.add.image(1650, 500, 'temple').setOrigin(0.5, 1);
-        this.add.image(1580, 500, 'lantern').setOrigin(0.5, 1);
-        this.add.image(1750, 500, 'lantern').setOrigin(0.5, 1);
-        this.add.image(1850, 500, 'cherry-tree').setOrigin(0.5, 1);
+        this.add.image(1500, 500, 'torii').setOrigin(0.5, 1).setDepth(4);
+        this.add.image(1650, 500, 'temple').setOrigin(0.5, 1).setDepth(4);
+        this.add.image(1580, 500, 'lantern').setOrigin(0.5, 1).setDepth(4);
+        this.add.image(1750, 500, 'lantern').setOrigin(0.5, 1).setDepth(4);
+        this.add.image(1850, 500, 'cherry-tree').setOrigin(0.5, 1).setDepth(4);
 
         // Bridge over stream
-        this.add.image(2010, 500, 'bridge').setOrigin(0.5, 1);
+        this.add.image(2010, 500, 'bridge').setOrigin(0.5, 1).setDepth(4);
 
         // Outskirts - getting darker
-        this.add.image(2150, 500, 'cherry-tree').setOrigin(0.5, 1);
-        this.add.image(2250, 500, 'house-small').setOrigin(0.5, 1);
+        this.add.image(2150, 500, 'cherry-tree').setOrigin(0.5, 1).setDepth(4);
+        this.add.image(2250, 500, 'house-small').setOrigin(0.5, 1).setDepth(4);
 
         // ===== END ZONE (depends on belt level) =====
         const isBlackBelt = beltIndex >= 6;
@@ -96,13 +96,13 @@ class CityScene extends Phaser.Scene {
         if (isBlackBelt) {
             // DARK ZONE (demon territory) - only at Black Belt
             for (let i = 0; i < 15; i++) {
-                this.add.rectangle(2350 + i * 30 + 17, 300, 35, 600, 0x0A0A1A, i * 0.05);
+                this.add.rectangle(2350 + i * 30 + 17, 300, 35, 600, 0x0A0A1A, i * 0.05).setDepth(4);
             }
-            this.add.image(2450, 500, 'dead-tree').setOrigin(0.5, 1);
-            this.add.image(2550, 500, 'dead-tree').setOrigin(0.5, 1);
-            this.add.image(2650, 500, 'broken-torii').setOrigin(0.5, 1);
+            this.add.image(2450, 500, 'dead-tree').setOrigin(0.5, 1).setDepth(4);
+            this.add.image(2550, 500, 'dead-tree').setOrigin(0.5, 1).setDepth(4);
+            this.add.image(2650, 500, 'broken-torii').setOrigin(0.5, 1).setDepth(4);
 
-            const demonGlow = this.add.circle(2700, 420, 50, 0x440000, 0.3);
+            const demonGlow = this.add.circle(2700, 420, 50, 0x440000, 0.3).setDepth(4);
             this.tweens.add({
                 targets: demonGlow, scaleX: 1.4, scaleY: 1.4, alpha: 0.1,
                 duration: 1000, yoyo: true, repeat: -1
@@ -110,14 +110,14 @@ class CityScene extends Phaser.Scene {
             this.add.text(2700, 340, '!!!', {
                 fontSize: '22px', fontFamily: '"Press Start 2P"', color: '#ff0000',
                 stroke: '#000000', strokeThickness: 3
-            }).setOrigin(0.5);
+            }).setOrigin(0.5).setDepth(4);
         } else {
             // Regular encounter zone - enemy waiting at the end
-            this.add.image(2500, 500, 'torii').setOrigin(0.5, 1);
+            this.add.image(2500, 500, 'torii').setOrigin(0.5, 1).setDepth(4);
             const encounterText = this.add.text(2650, 380, belt.enemy.kanji, {
                 fontSize: '28px', fontFamily: '"Press Start 2P"', color: '#CC2222',
                 stroke: '#000000', strokeThickness: 3
-            }).setOrigin(0.5);
+            }).setOrigin(0.5).setDepth(4);
             this.tweens.add({ targets: encounterText, alpha: 0.4, duration: 600, yoyo: true, repeat: -1 });
         }
 

@@ -281,8 +281,25 @@ class FightScene extends Phaser.Scene {
 
         // Player movement
         const speed = 3;
-        if (this.keyA.isDown && this.playerX > 40) this.playerX -= speed;
-        else if (this.keyD.isDown && this.playerX < 700) this.playerX += speed;
+        let walking = false;
+        if (this.keyA.isDown && this.playerX > 40) {
+            this.playerX -= speed;
+            this.playerSprite.setFlipX(true);
+            walking = true;
+        } else if (this.keyD.isDown && this.playerX < 700) {
+            this.playerX += speed;
+            this.playerSprite.setFlipX(false);
+            walking = true;
+        }
+
+        // Player walk animation (only when not in combat pose, not blocking, and not hit-stunned)
+        if (this.playerCooldown <= 0 && !this.isBlocking && this.playerHitFlash <= 0) {
+            if (walking && this.playerSprite.anims.currentAnim?.key !== 'player-walk') {
+                this.playerSprite.play('player-walk');
+            } else if (!walking && this.playerSprite.anims.currentAnim?.key === 'player-walk') {
+                this.playerSprite.play('player-idle');
+            }
+        }
 
         if (Phaser.Input.Keyboard.JustDown(this.keySpace) && this.isOnGround) {
             this.velocityY = this.JUMP_FORCE;
