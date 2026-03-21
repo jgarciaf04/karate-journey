@@ -5,6 +5,10 @@ class IntroScene extends Phaser.Scene {
         this.load.image('bg-intro', 'assets/tiles/bg-intro.png');
         this.load.image('parchment', 'assets/ui/parchment.png');
         this.load.image('petal', 'assets/fx/petal.png');
+        // Pre-load assets needed by next scenes to avoid loading gaps
+        this.load.image('bg-village', 'assets/tiles/bg-village.png');
+        this.load.spritesheet('player', 'assets/sprites/player.png', { frameWidth: 48, frameHeight: 48 });
+        this.load.spritesheet('sensei', 'assets/sprites/sensei.png', { frameWidth: 32, frameHeight: 48 });
     }
 
     create() {
@@ -87,7 +91,7 @@ class IntroScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-ENTER', () => {
             this.cameras.main.fadeOut(800, 0, 0, 0);
             this.cameras.main.once('camerafadeoutcomplete', () => {
-                this.scene.start('TrainingScene');
+                this.scene.start('VillageScene');
             });
         });
     }

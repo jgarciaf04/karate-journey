@@ -78,7 +78,7 @@ class GameOverScene extends Phaser.Scene {
         });
         this.input.keyboard.on('keydown-T', () => {
             this.cameras.main.fadeOut(600);
-            this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start('TrainingScene'));
+            this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start('VillageScene'));
         });
     }
 }

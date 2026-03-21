@@ -13,11 +13,12 @@ class FightScene extends Phaser.Scene {
         // Load correct enemy sprite based on belt level
         const beltIndex = this.registry.get('beltIndex') || 0;
         const enemyType = BELTS[beltIndex].enemy.type;
-        const isOni = enemyType === 'oni';
         const enemyKey = 'enemy-' + enemyType;
+        // Oni uses same 48x48 7-frame layout as player; others use 32x48 2-frame
+        const isFullSheet = enemyType === 'oni';
         this.load.spritesheet(enemyKey, 'assets/sprites/' + enemyKey + '.png', {
-            frameWidth: isOni ? 48 : 32,
-            frameHeight: isOni ? 64 : 48
+            frameWidth: isFullSheet ? 48 : 32,
+            frameHeight: 48
         });
     }
 
@@ -94,38 +95,47 @@ class FightScene extends Phaser.Scene {
             .setScale(2)
             .setOrigin(0.5, 1);
 
-        // Enemy animations (single-frame each)
+        // Enemy animations
         const idleKey = enemyType + '-idle';
         const attackKey = enemyType + '-attack';
         this.enemyIdleKey = idleKey;
         this.enemyAttackKey = attackKey;
+        this.isFullSheetEnemy = enemyType === 'oni';
 
         if (!this.anims.exists(idleKey)) {
-            this.anims.create({ key: idleKey, frames: [{ key: enemyKey, frame: 0 }], frameRate: 1 });
-            this.anims.create({ key: attackKey, frames: [{ key: enemyKey, frame: 1 }], frameRate: 1 });
+            if (this.isFullSheetEnemy) {
+                // Oni: same 7-frame layout as player (idle, walk1, walk2, punch, kick, block, hurt)
+                this.anims.create({ key: idleKey, frames: [{ key: enemyKey, frame: 0 }], frameRate: 1 });
+                this.anims.create({ key: enemyType + '-walk', frames: [{ key: enemyKey, frame: 1 }, { key: enemyKey, frame: 2 }], frameRate: 4, repeat: -1 });
+                this.anims.create({ key: enemyType + '-punch', frames: [{ key: enemyKey, frame: 3 }], frameRate: 1 });
+                this.anims.create({ key: enemyType + '-kick', frames: [{ key: enemyKey, frame: 4 }], frameRate: 1 });
+                this.anims.create({ key: enemyType + '-block', frames: [{ key: enemyKey, frame: 5 }], frameRate: 1 });
+                this.anims.create({ key: enemyType + '-hurt', frames: [{ key: enemyKey, frame: 6 }], frameRate: 1 });
+                this.anims.create({ key: attackKey, frames: [{ key: enemyKey, frame: 3 }], frameRate: 1 }); // default attack = punch
+            } else {
+                // Other enemies: 2-frame (idle + attack)
+                this.anims.create({ key: idleKey, frames: [{ key: enemyKey, frame: 0 }], frameRate: 1 });
+                this.anims.create({ key: attackKey, frames: [{ key: enemyKey, frame: 1 }], frameRate: 1 });
+            }
         }
 
         this.monsterSprite.play(idleKey);
+        this.monsterSprite.setFlipX(true); // Face the player (face left)
 
-        // Eye glow overlay - pulsing red tint on the monster
+        // Eye glow overlay - pulsing purple tint for Oni, red for others
+        const glowTint = this.isFullSheetEnemy ? 0x8800FF : 0xFF0000;
         this.eyeGlow = this.add.sprite(this.monsterX, this.monsterBaseY, enemyKey, 0)
             .setDepth(5)
             .setScale(2)
             .setOrigin(0.5, 1)
-            .setTint(0xFF0000)
+            .setTint(glowTint)
             .setAlpha(0.08)
-            .setBlendMode(Phaser.BlendModes.ADD);
+            .setBlendMode(Phaser.BlendModes.ADD)
+            .setFlipX(true);
 
         this.tweens.add({
-            targets: this.eyeGlow, alpha: 0.2, duration: 400,
+            targets: this.eyeGlow, alpha: 0.15, duration: 500,
             yoyo: true, repeat: -1
-        });
-
-        // Monster idle hover
-        this.tweens.add({
-            targets: [this.monsterSprite, this.eyeGlow],
-            y: '-=4', duration: 800,
-            yoyo: true, repeat: -1, ease: 'Sine.easeInOut'
         });
 
         // ===== HEARTS UI =====
@@ -299,10 +309,22 @@ class FightScene extends Phaser.Scene {
 
         // ===== MONSTER WALKS TOWARD PLAYER =====
         const dist = this.monsterX - this.playerX;
+        let monsterWalking = false;
         if (dist > 70 && !this.monsterAttacking) {
             this.monsterX -= this.monsterSpeed;
+            monsterWalking = true;
         } else if (dist < 50) {
             this.monsterX += 0.3;
+        }
+
+        // Monster walk animation (Oni has walk frames)
+        if (this.isFullSheetEnemy && !this.monsterAttacking && this.monsterHitFlash <= 0) {
+            const walkKey = this.enemyKey.replace('enemy-', '') + '-walk';
+            if (monsterWalking && this.monsterSprite.anims.currentAnim?.key !== walkKey) {
+                this.monsterSprite.play(walkKey);
+            } else if (!monsterWalking && this.monsterSprite.anims.currentAnim?.key === walkKey) {
+                this.monsterSprite.play(this.enemyIdleKey);
+            }
         }
 
         this.monsterSprite.setX(this.monsterX);
@@ -363,9 +385,14 @@ class FightScene extends Phaser.Scene {
         this.setPlayerPose(type);
         this.time.delayedCall(300, () => { if (this.playerPose === type) this.setPlayerPose('idle'); });
 
-        // Show monster attack frame briefly on hit for visual feedback
-        this.monsterSprite.play(this.enemyAttackKey);
-        this.time.delayedCall(200, () => { if (!this.gameOver) this.monsterSprite.play(this.enemyIdleKey); });
+        // Show monster hurt reaction on hit
+        if (this.isFullSheetEnemy) {
+            const hurtKey = this.enemyKey.replace('enemy-', '') + '-hurt';
+            this.monsterSprite.play(hurtKey);
+        } else {
+            this.monsterSprite.play(this.enemyAttackKey);
+        }
+        this.time.delayedCall(250, () => { if (!this.gameOver) this.monsterSprite.play(this.enemyIdleKey); });
 
         this.showAction(label, '#FFD700', 450);
 
@@ -394,9 +421,19 @@ class FightScene extends Phaser.Scene {
     monsterAttack() {
         if (this.gameOver) return;
 
-        // Monster attack animation
-        this.monsterSprite.play(this.enemyAttackKey);
-        this.time.delayedCall(400, () => { if (!this.gameOver) this.monsterSprite.play(this.enemyIdleKey); });
+        // Monster attack animation — Oni randomly punches or kicks
+        if (this.isFullSheetEnemy) {
+            const atkType = Math.random() > 0.5 ? 'punch' : 'kick';
+            const atkKey = this.enemyKey.replace('enemy-', '') + '-' + atkType;
+            this.monsterSprite.play(atkKey);
+        } else {
+            this.monsterSprite.play(this.enemyAttackKey);
+        }
+        this.monsterAttacking = true;
+        this.time.delayedCall(400, () => {
+            if (!this.gameOver) this.monsterSprite.play(this.enemyIdleKey);
+            this.monsterAttacking = false;
+        });
 
         const dist = Math.abs(this.monsterX - this.playerX);
         if (dist > 120) {

@@ -33,7 +33,10 @@ class CityScene extends Phaser.Scene {
 
     create() {
         this.cameras.main.fadeIn(800);
+        this.input.keyboard.removeAllListeners();
         const WORLD_W = 2800;
+        const beltIndex = this.registry.get('beltIndex') || 0;
+        const belt = BELTS[beltIndex];
 
         this.cameras.main.setBounds(0, 0, WORLD_W, 600);
 
@@ -127,8 +130,6 @@ class CityScene extends Phaser.Scene {
         this.triggered = false;
 
         // Create player sprite from spritesheet, frame 0 (idle)
-        const beltIndex = this.registry.get('beltIndex') || 0;
-        const belt = BELTS[beltIndex];
         this.playerSprite = this.add.sprite(this.playerX, this.playerY, 'player', 0)
             .setDepth(5)
             .setScale(2)

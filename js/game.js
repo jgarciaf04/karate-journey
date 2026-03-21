@@ -33,7 +33,7 @@ const config = {
         default: 'arcade',
         arcade: { gravity: { y: 0 }, debug: false }
     },
-    scene: [IntroScene, TrainingScene, CityScene, FightScene, VictoryScene, GameOverScene],
+    scene: [IntroScene, VillageScene, TrainingScene, CityScene, FightScene, VictoryScene, GameOverScene],
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH

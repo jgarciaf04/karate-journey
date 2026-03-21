@@ -19,7 +19,17 @@ class TrainingScene extends Phaser.Scene {
     create() {
         this.cameras.main.fadeIn(800);
         this.input.keyboard.removeAllListeners();
-        this.learned = { punch: false, kick: false, block: false };
+        const beltIndex = this.registry.get('beltIndex') || 0;
+        this.beltIndex = beltIndex;
+        this.currentBelt = BELTS[beltIndex];
+
+        // If returning for higher belt, player already knows basic moves
+        if (beltIndex > 0) {
+            this.learned = { punch: true, kick: true, block: true };
+        } else {
+            this.learned = { punch: false, kick: false, block: false };
+        }
+
         this.playerX = 250;
         this.playerBaseY = 440;
         this.playerY = this.playerBaseY;
@@ -31,13 +41,13 @@ class TrainingScene extends Phaser.Scene {
         this.currentPose = 'idle';
 
         // Phase: 'learn', 'exam_ready', 'exam', 'passed'
-        this.phase = 'learn';
+        this.phase = beltIndex > 0 ? 'exam_ready' : 'learn';
         this.examSequence = [];
         this.examIndex = 0;
         this.examTimer = 0;
-        this.examTimeLimit = 2500;
+        this.examTimeLimit = this.currentBelt.examTime;
         this.examCorrect = 0;
-        this.examRequired = 5;
+        this.examRequired = this.currentBelt.examMoves;
 
         // Background
         this.add.image(400, 300, 'bg-training').setDepth(0);
@@ -55,6 +65,9 @@ class TrainingScene extends Phaser.Scene {
 
         // Player sprite
         this.playerSprite = this.add.sprite(this.playerX, this.playerY, 'player', 0).setDepth(5).setScale(2).setOrigin(0.5, 1);
+        if (this.currentBelt.color !== 0xFFFFFF) {
+            this.playerSprite.setTint(this.currentBelt.color);
+        }
 
         // Player animations (guarded for scene restart)
         if (!this.anims.exists('player-idle')) {
@@ -131,8 +144,25 @@ class TrainingScene extends Phaser.Scene {
         if (this.actionCooldown > 0) this.actionCooldown -= delta;
 
         const speed = 3;
-        if (this.keyA.isDown && this.playerX > 50) this.playerX -= speed;
-        else if (this.keyD.isDown && this.playerX < 750) this.playerX += speed;
+        let walking = false;
+        if (this.keyA.isDown && this.playerX > 50) {
+            this.playerX -= speed;
+            this.playerSprite.setFlipX(true);
+            walking = true;
+        } else if (this.keyD.isDown && this.playerX < 750) {
+            this.playerX += speed;
+            this.playerSprite.setFlipX(false);
+            walking = true;
+        }
+
+        // Play walk or idle animation (only when not performing action)
+        if (this.actionCooldown <= 0) {
+            if (walking && this.playerSprite.anims.currentAnim?.key !== 'player-walk') {
+                this.playerSprite.play('player-walk');
+            } else if (!walking && this.playerSprite.anims.currentAnim?.key !== 'player-idle') {
+                this.playerSprite.play('player-idle');
+            }
+        }
 
         if (Phaser.Input.Keyboard.JustDown(this.keySpace) && this.isOnGround) {
             this.velocityY = this.JUMP_FORCE;
@@ -181,7 +211,6 @@ class TrainingScene extends Phaser.Scene {
             this.cameras.main.fadeOut(800);
             this.cameras.main.once('camerafadeoutcomplete', () => {
                 this.registry.set('learnedMoves', this.learned);
-                this.registry.set('beltIndex', 1);
                 this.scene.start('CityScene');
             });
         }
@@ -285,15 +314,12 @@ class TrainingScene extends Phaser.Scene {
         this.examTimerBg.setAlpha(0);
         this.examTimerBar.setAlpha(0);
 
-        // Belt promotion flash
+        // Exam passed flash
         this.cameras.main.flash(500, 255, 215, 0);
-        this.showFeedback('EXAM PASSED! You earned the ' + BELTS[1].name + ' Belt!', '#FFD700');
-
-        // Apply new belt color tint to player sprite
-        this.playerSprite.setTint(BELTS[1].color);
+        this.showFeedback('EXAM PASSED! Go face the ' + this.currentBelt.enemy.name + '!', '#FFD700');
 
         // Belt glow
-        const glow = this.add.circle(this.playerX, this.playerY, 40, BELTS[1].color, 0.2).setDepth(15);
+        const glow = this.add.circle(this.playerX, this.playerY, 40, this.currentBelt.color, 0.2).setDepth(15);
         this.tweens.add({
             targets: glow, scaleX: 2, scaleY: 2, alpha: 0, duration: 1000,
             onComplete: () => glow.destroy()
@@ -326,7 +352,7 @@ class TrainingScene extends Phaser.Scene {
             `Kick[K]:${this.learned.kick ? 'OK' : '--'}`,
             `Block[L]:${this.learned.block ? 'OK' : '--'}`
         ].join(' | ');
-        this.statusText.setText(moves);
+        this.statusText.setText(this.currentBelt.kanji + ' ' + this.currentBelt.name + ' | ' + moves);
 
         if (this.phase === 'learn') {
             const next = this.getNextLesson();
@@ -339,8 +365,8 @@ class TrainingScene extends Phaser.Scene {
             this.senseiSpeech.setText(tips[next]);
             this.senseiSprite.play('sensei-teaching');
         } else if (this.phase === 'exam_ready') {
-            this.instructionText.setText('All moves learned! Press ENTER to take the Sensei\'s exam');
-            this.senseiSpeech.setText('"Show me what\nyou have learned.\nPress ENTER."');
+            this.instructionText.setText(this.currentBelt.name + ' Belt Exam \u2014 Press ENTER to begin');
+            this.senseiSpeech.setText('"Show me your\nmastery, student.\nPress ENTER."');
             this.senseiSprite.play('sensei-idle');
         } else if (this.phase === 'exam') {
             const move = this.examSequence[this.examIndex];
@@ -349,8 +375,8 @@ class TrainingScene extends Phaser.Scene {
             this.instructionText.setText(`Perform: ${move.toUpperCase()} [${this.keyFor(move)}]`);
             this.senseiSpeech.setText(`"${move.toUpperCase()}!\nNow!"`);
         } else if (this.phase === 'passed') {
-            this.instructionText.setText(BELTS[1].name + ' Belt earned! Press ENTER to go to the village');
-            this.senseiSpeech.setText('"You are ready.\nGo, young warrior.\nProtect our village."');
+            this.instructionText.setText('Exam passed! Press ENTER to begin your adventure');
+            this.senseiSpeech.setText('"You are ready.\nGo face the\n' + this.currentBelt.enemy.name + '."');
         }
     }
 

@@ -186,7 +186,7 @@ class VictoryScene extends Phaser.Scene {
         // ENTER → CityScene for next belt level
         this.input.keyboard.on('keydown-ENTER', () => {
             this.cameras.main.fadeOut(800);
-            this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start('CityScene'));
+            this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start('VillageScene'));
         });
     }
 }
