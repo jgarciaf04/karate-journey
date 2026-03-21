@@ -292,8 +292,8 @@ class FightScene extends Phaser.Scene {
             walking = true;
         }
 
-        // Player walk animation (only when not in combat pose and not blocking)
-        if (this.playerCooldown <= 0 && !this.isBlocking) {
+        // Player walk animation (only when not in combat pose, not blocking, and not hit-stunned)
+        if (this.playerCooldown <= 0 && !this.isBlocking && this.playerHitFlash <= 0) {
             if (walking && this.playerSprite.anims.currentAnim?.key !== 'player-walk') {
                 this.playerSprite.play('player-walk');
             } else if (!walking && this.playerSprite.anims.currentAnim?.key === 'player-walk') {
