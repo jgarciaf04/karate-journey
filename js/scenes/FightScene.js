@@ -60,7 +60,7 @@ class FightScene extends Phaser.Scene {
         this.monsterAttacking = false;
 
         // ===== BACKGROUND =====
-        this.add.image(400, 300, 'bg-fight').setDepth(0);
+        this.add.image(400, 300, 'bg-fight').setDisplaySize(800, 600).setDepth(0);
 
         // ===== PLAYER SPRITE =====
         this.playerSprite = this.add.sprite(this.playerX, this.playerY, 'player', 0)
