@@ -4,7 +4,7 @@ class GameOverScene extends Phaser.Scene {
     preload() {
         this.load.image('bg-gameover', 'assets/tiles/bg-gameover.png');
         this.load.image('parchment', 'assets/ui/parchment.png');
-        this.load.spritesheet('player', 'assets/sprites/player.png', { frameWidth: 32, frameHeight: 48 });
+        this.load.spritesheet('player', 'assets/sprites/player.png', { frameWidth: 48, frameHeight: 48 });
         this.load.image('petal', 'assets/fx/petal.png');
     }
 

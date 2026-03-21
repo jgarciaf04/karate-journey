@@ -3,7 +3,7 @@ class FightScene extends Phaser.Scene {
 
     preload() {
         this.load.image('bg-fight', 'assets/tiles/bg-fight.png');
-        this.load.spritesheet('player', 'assets/sprites/player.png', { frameWidth: 32, frameHeight: 48 });
+        this.load.spritesheet('player', 'assets/sprites/player.png', { frameWidth: 48, frameHeight: 48 });
         this.load.spritesheet('hearts', 'assets/ui/hearts.png', { frameWidth: 16, frameHeight: 16 });
         this.load.image('impact-punch', 'assets/fx/impact-punch.png');
         this.load.image('impact-kick', 'assets/fx/impact-kick.png');

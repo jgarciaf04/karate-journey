@@ -9,7 +9,7 @@ class TrainingScene extends Phaser.Scene {
         this.load.image('impact-kick', 'assets/fx/impact-kick.png');
         this.load.image('shield', 'assets/fx/shield.png');
         this.load.spritesheet('player', 'assets/sprites/player.png', {
-            frameWidth: 32, frameHeight: 48
+            frameWidth: 48, frameHeight: 48
         });
         this.load.spritesheet('sensei', 'assets/sprites/sensei.png', {
             frameWidth: 32, frameHeight: 48
@@ -181,6 +181,7 @@ class TrainingScene extends Phaser.Scene {
             this.cameras.main.fadeOut(800);
             this.cameras.main.once('camerafadeoutcomplete', () => {
                 this.registry.set('learnedMoves', this.learned);
+                this.registry.set('beltIndex', 1);
                 this.scene.start('CityScene');
             });
         }
@@ -288,8 +289,11 @@ class TrainingScene extends Phaser.Scene {
         this.cameras.main.flash(500, 255, 215, 0);
         this.showFeedback('EXAM PASSED! You earned the ' + BELTS[1].name + ' Belt!', '#FFD700');
 
+        // Apply new belt color tint to player sprite
+        this.playerSprite.setTint(BELTS[1].color);
+
         // Belt glow
-        const glow = this.add.circle(this.playerX, this.playerY, 40, 0xFFD700, 0.2).setDepth(15);
+        const glow = this.add.circle(this.playerX, this.playerY, 40, BELTS[1].color, 0.2).setDepth(15);
         this.tweens.add({
             targets: glow, scaleX: 2, scaleY: 2, alpha: 0, duration: 1000,
             onComplete: () => glow.destroy()

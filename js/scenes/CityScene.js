@@ -23,7 +23,7 @@ class CityScene extends Phaser.Scene {
 
         // Player spritesheet (5 frames, 32x48 each)
         this.load.spritesheet('player', 'assets/sprites/player.png', {
-            frameWidth: 32,
+            frameWidth: 48,
             frameHeight: 48
         });
 
@@ -87,32 +87,36 @@ class CityScene extends Phaser.Scene {
         this.add.image(2150, 500, 'cherry-tree').setOrigin(0.5, 1);
         this.add.image(2250, 500, 'house-small').setOrigin(0.5, 1);
 
-        // ===== DARK ZONE (demon territory) =====
+        // ===== END ZONE (depends on belt level) =====
+        const isBlackBelt = beltIndex >= 6;
 
-        // Darkness overlay gradient - series of rectangles with increasing alpha
-        for (let i = 0; i < 15; i++) {
-            this.add.rectangle(2350 + i * 30 + 17, 300, 35, 600, 0x0A0A1A, i * 0.05);
+        if (isBlackBelt) {
+            // DARK ZONE (demon territory) - only at Black Belt
+            for (let i = 0; i < 15; i++) {
+                this.add.rectangle(2350 + i * 30 + 17, 300, 35, 600, 0x0A0A1A, i * 0.05);
+            }
+            this.add.image(2450, 500, 'dead-tree').setOrigin(0.5, 1);
+            this.add.image(2550, 500, 'dead-tree').setOrigin(0.5, 1);
+            this.add.image(2650, 500, 'broken-torii').setOrigin(0.5, 1);
+
+            const demonGlow = this.add.circle(2700, 420, 50, 0x440000, 0.3);
+            this.tweens.add({
+                targets: demonGlow, scaleX: 1.4, scaleY: 1.4, alpha: 0.1,
+                duration: 1000, yoyo: true, repeat: -1
+            });
+            this.add.text(2700, 340, '!!!', {
+                fontSize: '22px', fontFamily: '"Press Start 2P"', color: '#ff0000',
+                stroke: '#000000', strokeThickness: 3
+            }).setOrigin(0.5);
+        } else {
+            // Regular encounter zone - enemy waiting at the end
+            this.add.image(2500, 500, 'torii').setOrigin(0.5, 1);
+            const encounterText = this.add.text(2650, 380, belt.enemy.kanji, {
+                fontSize: '28px', fontFamily: '"Press Start 2P"', color: '#CC2222',
+                stroke: '#000000', strokeThickness: 3
+            }).setOrigin(0.5);
+            this.tweens.add({ targets: encounterText, alpha: 0.4, duration: 600, yoyo: true, repeat: -1 });
         }
-
-        // Dead trees
-        this.add.image(2450, 500, 'dead-tree').setOrigin(0.5, 1);
-        this.add.image(2550, 500, 'dead-tree').setOrigin(0.5, 1);
-
-        // Broken torii
-        this.add.image(2650, 500, 'broken-torii').setOrigin(0.5, 1);
-
-        // Ominous glow (animated)
-        const demonGlow = this.add.circle(2700, 420, 50, 0x440000, 0.3);
-        this.tweens.add({
-            targets: demonGlow, scaleX: 1.4, scaleY: 1.4, alpha: 0.1,
-            duration: 1000, yoyo: true, repeat: -1
-        });
-
-        // "!!!" warning text
-        this.add.text(2700, 340, '!!!', {
-            fontSize: '22px', fontFamily: '"Press Start 2P"', color: '#ff0000',
-            fontStyle: 'bold', stroke: '#000000', strokeThickness: 3
-        }).setOrigin(0.5);
 
         // ===== PLAYER =====
         this.playerX = 150;
@@ -137,8 +141,12 @@ class CityScene extends Phaser.Scene {
         if (!this.anims.exists('player-idle')) {
             this.anims.create({ key: 'player-idle', frames: [{ key: 'player', frame: 0 }], frameRate: 1 });
             this.anims.create({ key: 'player-walk', frames: [{ key: 'player', frame: 1 }, { key: 'player', frame: 2 }], frameRate: 4, repeat: -1 });
+            this.anims.create({ key: 'player-punch', frames: [{ key: 'player', frame: 3 }], frameRate: 1 });
+            this.anims.create({ key: 'player-kick', frames: [{ key: 'player', frame: 4 }], frameRate: 1 });
+            this.anims.create({ key: 'player-block', frames: [{ key: 'player', frame: 5 }], frameRate: 1 });
         }
         this.playerSprite.play('player-idle');
+        this.attackCooldown = 0;
 
         // Camera follows the player sprite
         this.cameras.main.startFollow(this.playerSprite, true, 0.08, 0);
@@ -147,8 +155,9 @@ class CityScene extends Phaser.Scene {
         this.addPetals(20);
 
         // ===== UI (fixed to camera) =====
-        this.add.text(400, 575, 'A/D: Walk   SPACE: Jump   → Walk right to find the demon', {
-            fontSize: '11px', fontFamily: '"Press Start 2P"', color: '#F5E6C8',
+        const goalText = isBlackBelt ? '→ Face the Oni Demon!' : '→ Find the ' + belt.enemy.name;
+        this.add.text(400, 575, 'A/D: Walk  SPACE: Jump  J/K/L: Attack  ' + goalText, {
+            fontSize: '8px', fontFamily: '"Press Start 2P"', color: '#F5E6C8',
             backgroundColor: '#1A0A2Ecc', padding: { x: 10, y: 4 }
         }).setOrigin(0.5).setScrollFactor(0).setDepth(20);
 
@@ -163,27 +172,47 @@ class CityScene extends Phaser.Scene {
         this.keyA = this.input.keyboard.addKey('A');
         this.keyD = this.input.keyboard.addKey('D');
         this.keySpace = this.input.keyboard.addKey('SPACE');
+
+        // Attack keys (cosmetic only - attack the air)
+        this.input.keyboard.on('keydown-J', () => this.doAttackPose('punch'));
+        this.input.keyboard.on('keydown-K', () => this.doAttackPose('kick'));
+        this.input.keyboard.on('keydown-L', () => this.doAttackPose('block'));
     }
 
-    update() {
+    doAttackPose(pose) {
+        if (this.attackCooldown > 0) return;
+        this.attackCooldown = 400;
+        this.playerSprite.play('player-' + pose);
+        this.time.delayedCall(350, () => {
+            if (this.attackCooldown <= 50) this.playerSprite.play('player-idle');
+        });
+    }
+
+    update(time, delta) {
+        if (this.attackCooldown > 0) this.attackCooldown -= delta;
+
         const speed = 3;
         let walking = false;
-        if (this.keyA.isDown && this.playerX > 30) {
-            this.playerX -= speed;
-            this.playerSprite.setFlipX(true);
-            walking = true;
-        }
-        if (this.keyD.isDown && this.playerX < 2780) {
-            this.playerX += speed;
-            this.playerSprite.setFlipX(false);
-            walking = true;
+        if (this.attackCooldown <= 0) {
+            if (this.keyA.isDown && this.playerX > 30) {
+                this.playerX -= speed;
+                this.playerSprite.setFlipX(true);
+                walking = true;
+            }
+            if (this.keyD.isDown && this.playerX < 2780) {
+                this.playerX += speed;
+                this.playerSprite.setFlipX(false);
+                walking = true;
+            }
         }
 
-        // Play walk or idle animation
-        if (walking && this.playerSprite.anims.currentAnim?.key !== 'player-walk') {
-            this.playerSprite.play('player-walk');
-        } else if (!walking && this.playerSprite.anims.currentAnim?.key !== 'player-idle') {
-            this.playerSprite.play('player-idle');
+        // Play walk or idle animation (only when not attacking)
+        if (this.attackCooldown <= 0) {
+            if (walking && this.playerSprite.anims.currentAnim?.key !== 'player-walk') {
+                this.playerSprite.play('player-walk');
+            } else if (!walking && this.playerSprite.anims.currentAnim?.key !== 'player-idle') {
+                this.playerSprite.play('player-idle');
+            }
         }
 
         if (Phaser.Input.Keyboard.JustDown(this.keySpace) && this.isOnGround) {
